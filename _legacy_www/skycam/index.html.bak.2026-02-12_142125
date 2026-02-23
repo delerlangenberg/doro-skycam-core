@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SkyCam · Lovelace</title>
+<style>
+:root{
+  --bg0:#050815;
+  --bg1:#08122a;
+  --panel:#0d1a34;
+  --panel2:#0a142c;
+  --border:#203456;
+  --text:#e9f1ff;
+  --muted:#9fb3d6;
+  --link:#7aa2ff;
+  --good:#6ee7b7;
+  --warn:#fbbf24;
+  --bad:#fb7185;
+  --pill:#0b1833;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 15% 0%, #0b1a3b 0%, var(--bg0) 55%),
+    radial-gradient(900px 600px at 85% 10%, #0b1430 0%, var(--bg0) 60%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
+.wrap{max-width:1550px;margin:0 auto;padding:18px}
+.top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  margin-bottom:14px;
+}
+.brand{display:flex;flex-direction:column;gap:3px}
+h1{margin:0;font-size:18px;letter-spacing:.3px}
+.sub{color:var(--muted);font-size:13px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.nav a{
+  color:var(--text);text-decoration:none;font-size:13px;
+  border:1px solid var(--border);padding:7px 11px;border-radius:12px;
+  background:rgba(13,26,52,.55);
+}
+.nav a:hover{border-color:#2b4a7a}
+.grid{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;align-items:stretch}
+.card{
+  background:linear-gradient(180deg, rgba(13,26,52,.92), rgba(10,20,44,.92));
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px;
+  box-shadow:var(--shadow);
+  min-height:120px;
+}
+.card h2{margin:0 0 10px 0;font-size:13px;color:var(--muted);font-weight:650;letter-spacing:.2px}
+.hero{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+  padding:12px 12px;
+  border:1px solid rgba(32,52,86,.9);
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(10,20,44,.75), rgba(13,26,52,.55));
+  margin-bottom:14px;
+}
+.hero-left{display:flex;flex-direction:column;gap:4px}
+.hero-title{font-weight:750;letter-spacing:.25px}
+.hero-meta{color:var(--muted);font-size:13px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.pill{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(11,24,51,.65);
+  font-size:12.5px;
+  color:var(--muted);
+}
+.dot{width:9px;height:9px;border-radius:99px;background:var(--warn);box-shadow:0 0 0 4px rgba(251,191,36,.12)}
+.dot.good{background:var(--good);box-shadow:0 0 0 4px rgba(110,231,183,.12)}
+.dot.bad{background:var(--bad);box-shadow:0 0 0 4px rgba(251,113,133,.14)}
+.pill b{color:var(--text);font-weight:650}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv{
+  border:1px solid rgba(32,52,86,.8);
+  border-radius:14px;
+  padding:10px 10px;
+  background:rgba(10,20,44,.55);
+}
+.k{color:var(--muted);font-size:12px;margin-bottom:4px}
+.v{font-size:18px;font-weight:750;letter-spacing:.2px}
+.v small{font-size:12px;font-weight:650;color:var(--muted)}
+hr{border:0;border-top:1px solid rgba(32,52,86,.65);margin:12px 0}
+img{
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  border:1px solid rgba(32,52,86,.95);
+  background:#000;
+}
+.footerline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:12px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+.small{font-size:12px;color:var(--muted)}
+.badge{
+  padding:4px 8px;border-radius:999px;font-size:12px;
+  border:1px solid rgba(32,52,86,.95);
+  background:rgba(11,24,51,.7);
+  color:var(--muted);
+}
+.badge.good{border-color:rgba(110,231,183,.35);color:var(--good)}
+.badge.warn{border-color:rgba(251,191,36,.35);color:var(--warn)}
+.badge.bad{border-color:rgba(251,113,133,.35);color:var(--bad)}
+.list{margin:0;padding:0;list-style:none}
+.list li{padding:6px 0;border-bottom:1px solid rgba(32,52,86,.5)}
+.list li:last-child{border-bottom:0}
+a.inline{color:var(--link);text-decoration:none}
+a.inline:hover{text-decoration:underline}
+@media (max-width: 1100px){
+  .grid{grid-template-columns:1fr}
+  .nav{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <h1>SkyCam</h1>
+      <div class="sub">Lovelace · Still + MJPEG stream + weather</div>
+    </div>
+    <div class="nav">
+      <a href="/skycam/latest_full.jpg" target="_blank" rel="noopener">Still (full)</a>
+      <a href="/skycam/latest.jpg" target="_blank" rel="noopener">Still (web)</a>
+      <a href="/skycam/stream" target="_blank" rel="noopener">Stream</a>
+      <a href="/skycam/forecast.json" target="_blank" rel="noopener">forecast.json</a>
+      <a href="http://10.0.0.100/" target="_blank" rel="noopener">Landing</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-title">Control Tower</div>
+      <div class="hero-meta">Health view of camera ingestion + website endpoints</div>
+    </div>
+    <div class="pills">
+      <div class="pill"><span id="dotStill" class="dot"></span><b id="pillStill">Still</b>: <span id="pillStillTxt">checking…</span></div>
+      <div class="pill"><span id="dotStream" class="dot"></span><b id="pillStream">Stream</b>: <span id="pillStreamTxt">checking…</span></div>
+      <div class="pill"><span id="dotWx" class="dot"></span><b id="pillWx">Weather</b>: <span id="pillWxTxt">checking…</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Latest still image</h2>
+      <img id="still" alt="SkyCam still image" src="/skycam/latest_full.jpg"/>
+      <div class="footerline">
+        <div class="small">Auto-refresh: <span class="mono">5s</span> · Cache: disabled</div>
+        <div class="badge good" id="stillBadge">OK</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Weather</h2>
+      <div class="split">
+        <div class="kv">
+          <div class="k">Temperature</div>
+          <div class="v"><span id="t">—</span> <small>°C</small></div>
+        </div>
+        <div class="kv">
+          <div class="k">Humidity</div>
+          <div class="v"><span id="rh">—</span> <small>%</small></div>
+        </div>
+        <div class="kv">
+          <div class="k">Dew point</div>
+          <div class="v"><span id="dew">—</span> <small>°C</small></div>
+        </div>
+        <div class="kv">
+          <div class="k">Last update (UTC)</div>
+          <div class="v mono" style="font-size:13px;font-weight:700"><span id="ts">—</span></div>
+        </div>
+      </div>
+
+      <hr/>
+
+      <div class="small">
+        Source: <span id="src" class="mono">—</span>
+      </div>
+      <div class="small" style="margin-top:6px">
+        Update helper: <span class="mono">/usr/local/bin/skycam_weather_update.sh</span>
+      </div>
+
+      <hr/>
+
+      <h2>Endpoints</h2>
+      <ul class="list mono">
+        <li><a class="inline" href="/skycam/" target="_blank" rel="noopener">/skycam/</a></li>
+        <li><a class="inline" href="/skycam/latest_full.jpg" target="_blank" rel="noopener">/skycam/latest_full.jpg</a></li>
+        <li><a class="inline" href="/skycam/latest.jpg" target="_blank" rel="noopener">/skycam/latest.jpg</a></li>
+        <li><a class="inline" href="/skycam/forecast.json" target="_blank" rel="noopener">/skycam/forecast.json</a></li>
+        <li><a class="inline" href="/skycam/stream" target="_blank" rel="noopener">/skycam/stream</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id)=>document.getElementById(id);
+
+function setPill(kind, state, txt){
+  const dot = $("dot"+kind);
+  const span = $("pill"+kind+"Txt");
+  dot.classList.remove("good","bad");
+  if(state==="good"){ dot.classList.add("good"); }
+  if(state==="bad"){ dot.classList.add("bad"); }
+  span.textContent = txt;
+}
+
+function setBadge(el, state, txt){
+  el.classList.remove("good","warn","bad");
+  el.classList.add(state);
+  el.textContent = txt;
+}
+
+async function probeStream(){
+  // We only need to know if we can read the first bytes.
+  // Use AbortController so it never hangs.
+  const ctl = new AbortController();
+  const t = setTimeout(()=>ctl.abort(), 1200);
+  try{
+    const r = await fetch("/skycam/stream?t="+Date.now(), { cache:"no-store", signal: ctl.signal });
+    clearTimeout(t);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    setPill("Stream","good","ONLINE");
+  }catch(e){
+    clearTimeout(t);
+    setPill("Stream","bad","OFFLINE");
+  }
+}
+
+function refreshStill(){
+  const img = $("still");
+  const badge = $("stillBadge");
+
+  setBadge(badge,"warn","loading…");
+  const url = "/skycam/latest_full.jpg?t="+Date.now();
+
+  img.onload = ()=>{
+    setBadge(badge,"good","OK");
+    setPill("Still","good","ONLINE");
+  };
+  img.onerror = ()=>{
+    setBadge(badge,"bad","image missing");
+    setPill("Still","bad","OFFLINE");
+  };
+  img.src = url;
+}
+
+async function loadForecast(){
+  setPill("Wx","warn","loading…");
+  try{
+    const r = await fetch("/skycam/forecast.json?t="+Date.now(), {cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j = await r.json();
+    $("t").textContent   = (j.temperature_c ?? "—");
+    $("rh").textContent  = (j.humidity_pct ?? "—");
+    $("dew").textContent = (j.dewpoint_c ?? "—");
+    $("ts").textContent  = (j.generated_utc ?? "—");
+    $("src").textContent = (j.source ?? "—");
+    setPill("Wx","good","OK");
+  }catch(e){
+    setPill("Wx","bad","ERROR");
+  }
+}
+
+// first load
+refreshStill();
+loadForecast();
+probeStream();
+
+// loops
+setInterval(refreshStill, 5000);
+setInterval(loadForecast, 15000);
+setInterval(probeStream, 15000);
+</script>
+</body>
+</html>

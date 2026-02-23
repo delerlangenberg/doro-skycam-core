@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SkyCam Observatory · IT:U Austria</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:system-ui;background:#020617;color:#e5e7eb}
+.shell{max-width:1100px;margin:auto;padding:32px}
+h1{margin:0 0 6px}
+p{color:#94a3b8}
+.card{border:1px solid #1e293b;border-radius:16px;padding:18px;margin:16px 0;background:#020617}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
+.btn{padding:.5rem .9rem;border-radius:999px;border:1px solid #38bdf8;color:#e5e7eb;text-decoration:none}
+.btn.ghost{border-color:#1e293b;color:#94a3b8}
+code{background:#020617;border:1px solid #1e293b;padding:.2rem .4rem;border-radius:6px}
+.status{font-size:14px}
+.good{color:#22c55e}
+.warn{color:#eab308}
+</style>
+</head>
+
+<body>
+<div class="shell">
+
+<h1>🌌 SkyCam Observatory</h1>
+<p>Live all-sky camera with real-time meteorological data (OMEA).</p>
+
+<div class="card">
+  <h2>📸 Live View</h2>
+  <div class="row">
+    <a href="/skycam/sky_latest.jpg" class="btn">🖼 Latest Image</a>
+    <a href="/skycam/mjpeg" class="btn ghost">📹 Live Video (soon)</a>
+    <a href="/skycam/archive/" class="btn ghost">🗂 Daily Archive</a>
+  </div>
+  <img src="/skycam/sky_latest.jpg" style="width:100%;border-radius:12px" alt="Latest sky image">
+</div>
+
+<div class="card">
+  <h2>🌗 Sky Status</h2>
+  <div class="status">
+    • Day / Night: <span class="warn">computed soon</span><br>
+    • Cloud cover: <span class="warn">estimated soon</span><br>
+    • Sky clarity: <span class="warn">pending</span><br>
+    <br>
+    <strong>Best observing time:</strong>
+    <span class="warn">evaluation pending</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🌡 Meteorological Data</h2>
+  <div class="row">
+    <a href="/skycam/live.json" class="btn">📊 Live JSON</a>
+  </div>
+  <pre style="font-size:12px;overflow:auto" id="meteo">Loading…</pre>
+</div>
+
+<div class="card">
+  <h2>📡 Data & MQTT</h2>
+  <p>
+    MQTT Broker: <code>10.0.0.100:1883</code><br>
+    Topic: <code>skycam/meteo/live</code>
+  </p>
+</div>
+
+<div class="card">
+  <h2>📈 Charts & Analysis</h2>
+  <p>Live charts (temperature, humidity, pressure, wind) will appear here.</p>
+</div>
+
+</div>
+
+<script>
+fetch('/skycam/live.json')
+  .then(r => r.json())
+  .then(j => {
+    document.getElementById('meteo').textContent =
+      JSON.stringify(j, null, 2);
+  })
+  .catch(()=>{});
+</script>
+
+</body>
+</html>

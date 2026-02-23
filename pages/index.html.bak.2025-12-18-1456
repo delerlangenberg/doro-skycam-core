@@ -1,0 +1,144 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyCam — Live</title>
+  <style>
+    :root{--bg:#0a0f1a;--panel:#0f1624;--muted:#94a3b8;--ink:#e6edf3;--line:#1f2a3a;--accent:#4cc9f0}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 ui-sans-serif,system-ui}
+    .wrap{max-width:1200px;margin:0 auto;padding:24px}
+    h1{margin:0 0 6px;font-size:22px}
+    .sub{color:var(--muted);margin:0 0 18px}
+    .grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{background:rgba(15,22,36,.85);border:1px solid var(--line);border-radius:16px;padding:14px}
+    .card h2{margin:0 0 10px;font-size:16px;color:#cfe8ff}
+    .meta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px}
+    .dot{width:9px;height:9px;border-radius:999px;background:#22c55e;display:inline-block}
+    img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#000}
+    .small{color:var(--muted);font-size:12px;margin-top:8px}
+  </style>
+</head>
+<body>
+<div class="card">
+  <h2>Live Meteorology</h2>
+  <p id="meteo-status" style="color:#94a3b8">Loading…</p>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+    <div><b>Temperature</b><br><span id="m-temp">—</span> °C</div>
+    <div><b>Humidity</b><br><span id="m-rh">—</span> %</div>
+    <div><b>Pressure</b><br><span id="m-pres">—</span> hPa</div>
+    <div><b>Wind speed</b><br><span id="m-ws">—</span> m/s</div>
+    <div><b>Wind direction</b><br><span id="m-wd">—</span> °</div>
+    <div><b>Timestamp</b><br><span id="m-ts">—</span></div>
+  </div>
+  <p style="margin-top:10px">
+    <a class="btn" href="live.json">Download live.json</a>
+    <a class="btn" href="/skycam/meteo/">Daily CSV folder</a>
+  </p>
+</div>
+
+
+  <div class="wrap">
+    <h1>SkyCam — Live</h1>
+    <p class="sub">Live sky image and meteorological plots (Temp / RH).</p>
+
+    <div class="meta">
+      <span class="dot" id="dot"></span>
+      <span>Last update:</span>
+      <span id="last">loading…</span>
+    </div>
+<div class="btnrow" style="margin-top:10px">
+<a class="btn" href="gallery/" target="_blank">🖼️ View Gallery</a>
+
+  <a class="btn" href="latest.jpg" target="_blank">Open full image</a>
+  <a class="btn" href="latest.jpg" download>Download latest</a>
+  <a class="btn" href="gallery/" target="_blank">Gallery</a>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Instrument</h2>
+  <p class="small" style="margin:0">
+    Alcor System OMEA AllSky camera — continuous all-sky monitoring (day/night) for sky quality assessment and
+    detection of fast (meteors/fireballs) and slow (satellites/aurora) phenomena. Integrated dome heater adapts
+    to humidity and temperature.
+  </p>
+</div>
+
+
+<div class="btnrow" style="margin-top:10px">
+  <a class="btn" href="latest.jpg" target="_blank">Open full image</a>
+  <a class="btn" href="latest.jpg" download>Download latest</a>
+</div>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="card">
+        <h2>Live Sky Image</h2>
+<img id="sky" src="sky_latest.jpg" alt="SkyCam latest sky image"
+     onerror="this.onerror=null;this.src='placeholder.svg';" />
+
+        <div class="small">Auto-refreshes every 10 seconds.</div>
+      </div>
+
+      <div class="card">
+        <h2>Live Meteorology</h2>
+        <div style="display:grid;gap:12px">
+          <div>
+            <div class="small">Temperature</div>
+
+            <img id="temp" src="temp.jpg" alt="Temperature plot" />
+          </div>
+          <div>
+            <div class="small">Relative Humidity</div>
+            <img id="rh" src="RH.jpg" alt="Humidity plot" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const bust = () => "t=" + Date.now();
+  async function refresh(){
+    document.getElementById("sky").src = "sky_latest.jpg?" + bust();
+    document.getElementById("temp").src = "temp.jpg?" + bust();
+    document.getElementById("rh").src   = "RH.jpg?" + bust();
+    try{
+      const r = await fetch("last_update.txt?" + bust(), {cache:"no-store"});
+      document.getElementById("last").textContent = (await r.text()).trim();
+      document.getElementById("dot").style.background = "#22c55e";
+    }catch{
+      document.getElementById("last").textContent = "no data";
+      document.getElementById("dot").style.background = "#ef4444";
+    }
+  }
+  refresh();
+  setInterval(refresh, 10000);
+</script>
+<script>
+async function loadMeteo(){
+  try{
+    const r = await fetch('live.json?_=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+
+    document.getElementById('m-temp').textContent = d.temperature ?? '—';
+    document.getElementById('m-rh').textContent   = d.humidity ?? '—';
+    document.getElementById('m-pres').textContent = d.pressure ?? '—';
+    document.getElementById('m-ws').textContent   = d.wind_speed ?? '—';
+    document.getElementById('m-wd').textContent   = d.wind_dir ?? '—';
+    document.getElementById('m-ts').textContent   = d.timestamp ?? '—';
+
+    document.getElementById('meteo-status').textContent = 'Live via MQTT → Lovelace ingest';
+  }catch(e){
+    document.getElementById('meteo-status').textContent = 'No live data yet ('+e.message+')';
+  }
+}
+loadMeteo();
+setInterval(loadMeteo, 5000);
+</script>
+
+</body>
+</html>

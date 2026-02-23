@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SkyCam — Live</title>
+  <style>
+    :root{--bg:#0a0f1a;--panel:#0f1624;--muted:#94a3b8;--ink:#e6edf3;--line:#1f2a3a;--accent:#4cc9f0}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    header{padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(76,201,240,.12),transparent)}
+    h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .sub{color:var(--muted);margin-top:6px;font-size:13px}
+    main{padding:22px;max-width:1200px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:1.4fr .6fr;gap:16px}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 10px;font-size:14px;color:var(--muted);font-weight:600}
+    img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#000}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px}
+    .btn{display:inline-block;padding:10px 12px;border-radius:10px;background:rgba(76,201,240,.12);border:1px solid rgba(76,201,240,.25);color:var(--ink);text-decoration:none}
+    .btn:hover{border-color:rgba(76,201,240,.5)}
+    pre{margin:0;white-space:pre-wrap;color:var(--muted);font-size:12px}
+    .k{color:var(--ink)}
+  </style>
+</head>
+<body>
+<header>
+  <h1>SkyCam — Live Sky Image</h1>
+  <div class="sub">Auto-refreshes every 5 seconds. Published from FTP uploads on Lovelace.</div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>Live Image</h2>
+      <img id="sky" src="/skycam/sky_latest.jpg" alt="SkyCam latest image"/>
+      <div style="margin-top:12px" class="row">
+        <span class="pill"><span class="k">Last publish:</span> <span id="last">loading…</span></span>
+        <a class="btn" href="/skycam/sky_latest.jpg" download>⬇ Download latest JPG</a>
+        <a class="btn" href="/skycam/gallery/">🖼 Gallery</a>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2>Meteorological Overlays</h2>
+      <div class="row" style="margin-bottom:10px">
+        <a class="btn" href="/skycam/temp.jpg" target="_blank">Open temp.jpg</a>
+        <a class="btn" href="/skycam/RH.jpg" target="_blank">Open RH.jpg</a>
+      </div>
+      <img id="temp" src="/skycam/temp.jpg" alt="Temperature overlay" style="margin-bottom:12px"/>
+      <img id="rh" src="/skycam/RH.jpg" alt="Humidity overlay"/>
+
+      <div style="margin-top:12px">
+        <h2>Live Meteo JSON</h2>
+        <div class="row" style="margin-bottom:10px">
+          <a class="btn" href="/skycam/live.json" target="_blank">Open live.json</a>
+        </div>
+        <pre id="meteo">loading…</pre>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  function bust(url){ return url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(); }
+
+  async function refresh() {
+    document.getElementById("sky").src  = bust("/skycam/sky_latest.jpg");
+    document.getElementById("temp").src = bust("/skycam/temp.jpg");
+    document.getElementById("rh").src   = bust("/skycam/RH.jpg");
+
+    try{
+      const t = await fetch(bust("/skycam/last_update.txt"), {cache:"no-store"});
+      document.getElementById("last").textContent = (await t.text()).trim();
+    }catch(e){ document.getElementById("last").textContent = "—"; }
+
+    try{
+      const j = await fetch(bust("/skycam/live.json"), {cache:"no-store"});
+      document.getElementById("meteo").textContent = JSON.stringify(await j.json(), null, 2);
+    }catch(e){ document.getElementById("meteo").textContent = "live.json not available yet"; }
+  }
+
+  refresh();
+  setInterval(refresh, 5000);
+</script>
+</body>
+</html>

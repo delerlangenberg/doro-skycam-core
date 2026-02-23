@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SkyCam — Docs</title>
+<style>
+  :root{--bg:#0a0f1a;--panel:#0f1624;--muted:#94a3b8;--ink:#e6edf3;--line:#1f2a3a;--accent:#4cc9f0}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  header{padding:18px 22px;border-bottom:1px solid var(--line)}
+  main{max-width:1100px;margin:0 auto;padding:22px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+  h1{margin:0;font-size:18px}
+  h2{margin:0 0 10px;font-size:14px;color:var(--muted)}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{white-space:pre-wrap;background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--muted)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>SkyCam — Documentation</h1>
+  <div style="color:var(--muted);margin-top:6px">Where data lands, how it flows, how to test.</div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Web Endpoints</h2>
+    <div class="row">
+      <span class="pill">Home: <a href="http://10.0.0.100/" target="_blank">http://10.0.0.100/</a></span>
+      <span class="pill">SkyCam: <a href="http://10.0.0.100/skycam/" target="_blank">/skycam/</a></span>
+      <span class="pill">Sky Latest: <a href="http://10.0.0.100/skycam/sky_latest.jpg" target="_blank">/skycam/sky_latest.jpg</a></span>
+      <span class="pill">Meteo JSON: <a href="http://10.0.0.100/skycam/live.json" target="_blank">/skycam/live.json</a></span>
+      <span class="pill">Health: <a href="http://10.0.0.100/health.txt" target="_blank">/health.txt</a></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Where files land on Lovelace</h2>
+    <pre>
+FTP upload folder:
+  /srv/ftp/doro/general/
+
+Published web folder:
+  /var/www/html/skycam/
+
+Files:
+  /srv/ftp/doro/general/sky_latest.jpg   (from OMEA Windows via FTP)
+  /var/www/html/skycam/sky_latest.jpg    (published copy for web)
+
+Meteo ingest output:
+  /srv/data/skycam/meteo/live.json
+  /srv/data/skycam/meteo/YYYY-MM-DD.csv
+    </pre>
+  </div>
+
+  <div class="card">
+    <h2>MQTT</h2>
+    <pre>
+Broker:
+  10.0.0.100:1883
+
+Topic:
+  skycam/meteo/live
+
+Test publish:
+  mosquitto_pub -h 127.0.0.1 -t skycam/meteo/live -m '{"timestamp":"2025-12-18T00:00:00+01:00","temperature":4.2,"humidity":79.1,"pressure":1007.8,"wind_speed":1.9,"wind_dir":230}'
+
+Watch live:
+  mosquitto_sub -h 127.0.0.1 -t skycam/meteo/live -v
+    </pre>
+  </div>
+
+  <div class="card">
+    <h2>Publish pipeline</h2>
+    <pre>
+Publisher (FTP → Web):
+  /opt/skycam/publish_skycam.sh
+Runs via cron every minute.
+
+Service (MQTT → JSON/CSV):
+  skycam-meteo-ingest.service
+Writes:
+  /srv/data/skycam/meteo/live.json
+    </pre>
+  </div>
+
+  <div class="card">
+    <h2>Other Lovelace services</h2>
+    <pre>
+JupyterHub: http://10.0.0.100:8000/
+AirQ:       http://10.0.0.100:5050/
+GeoTiny:    http://10.0.0.100:8050/
+OpenWebUI:  http://10.0.0.100:3000/
+Ollama:     http://10.0.0.100:11434/
+    </pre>
+  </div>
+</main>
+</body>
+</html>

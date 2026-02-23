@@ -1,0 +1,33 @@
+# runtime / generated
+repos/
+pages/gallery/
+pages/archive/
+pages/charts/
+pages/meteo/
+pages/live.json
+pages/last_update.txt
+pages/archive/images/
+
+# caches / temp
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.sqlite
+.env
+.venv/
+venv/
+
+# editor
+.vscode/
+.DS_Store
+
+# binaries / data
+*.csv
+*.zip
+*.tar
+*.gz
+*.jpg
+*.png
+*.svg
+*.fits
