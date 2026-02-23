@@ -31,3 +31,10 @@ venv/
 *.png
 *.svg
 *.fits
+
+# backups / editor leftovers
+*.bak
+*.bak.*
+*.bak-*
+*.old
+*~
